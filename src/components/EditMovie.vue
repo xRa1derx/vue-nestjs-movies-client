@@ -39,6 +39,7 @@
 
 <script>
 import axios from 'axios';
+import { server } from '../../src/utils/helper';
 import { useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
 export default {
@@ -55,7 +56,7 @@ export default {
     };
     const getMovie = () => {
       axios
-        .get(`/movies/${route.params.id}`)
+        .get(`${server.baseURL}/movies/${route.params.id}`)
         .then((res) => (movie.value = res.data));
     };
     const updateMovie = () => {
@@ -66,7 +67,7 @@ export default {
       formData.append('rating', movie.value.rating);
       formData.append('year', movie.value.year);
       axios
-        .patch(`/movies/${route.params.id}`, formData
+        .patch(`${server.baseURL}/movies/${route.params.id}`, formData
         , {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -78,7 +79,7 @@ export default {
         });
     };
     const deleteMovie = (id) => {
-      axios.delete(`/movies/${id}`);
+      axios.delete(`${server.baseURL}/movies/${id}`);
     };
     onMounted(() => {
       getMovie();

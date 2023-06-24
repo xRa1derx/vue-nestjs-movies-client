@@ -8,7 +8,7 @@
 
 <script>
 import axios from 'axios';
-// import { server } from '../utils/helper'
+import { server } from '../utils/helper'
 import { ref } from 'vue';
 export default {
   name: 'RegisterComponent',
@@ -19,7 +19,7 @@ export default {
     const login = ref('');
     const password = ref('');
     const register = () => {
-      axios.post(`/auth/registration`, { username: login.value, password: password.value }).then((res) => console.log(res)).catch(err => console.log(err))
+      axios.post(`${server.baseURL}/auth/registration`, { username: login.value, password: password.value }).then((res) => console.log(res)).catch(err => console.log(err))
     };
     return { register, login, password }
   }

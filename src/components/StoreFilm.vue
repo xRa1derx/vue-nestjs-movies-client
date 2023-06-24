@@ -20,7 +20,7 @@
 <script>
 import { ref } from 'vue';
 import axios from 'axios';
-// import { server } from '../../src/utils/helper';
+import { server } from '../../src/utils/helper';
 export default {
   setup() {
     const title = ref('');
@@ -39,7 +39,7 @@ export default {
       formData.append('rating', rating.value);
       formData.append('year', year.value);
       axios
-        .post(`/movies`, formData)
+        .post(`${server.baseURL}/movies`, formData)
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
     };

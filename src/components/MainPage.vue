@@ -25,7 +25,7 @@
 
 <script>
 import axios from 'axios';
-// import { server } from '../../src/utils/helper';
+import { server } from '../../src/utils/helper';
 import { onMounted, ref } from 'vue';
 import StoreFilm from './StoreFilm.vue';
 export default {
@@ -33,7 +33,7 @@ export default {
   setup() {
     const movies = ref([]);
     const getMovies = () => {
-      axios.get(`/movies`).then((res) => {
+      axios.get(`${server.baseURL}/movies`).then((res) => {
         console.log(res);
         movies.value = res.data;
       });

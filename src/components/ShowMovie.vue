@@ -35,6 +35,7 @@
 
 <script>
 import axios from 'axios';
+import { server } from '../../src/utils/helper';
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import EditMovie from './EditMovie.vue';
@@ -47,12 +48,12 @@ export default {
     const isEdit = ref(false);
     const getMovie = () => {
       axios
-        .get(`/movies/${route.params.id}`)
+        .get(`${server.baseURL}/movies/${route.params.id}`)
         .then((res) => (movie.value = res.data));
     };
     const deleteMovie = (id) => {
       axios
-        .delete(`/movies/${id}`)
+        .delete(`${server.baseURL}/movies/${id}`)
         .then(() => router.push({ name: 'Home' }));
     };
     const editMovie = () => {
