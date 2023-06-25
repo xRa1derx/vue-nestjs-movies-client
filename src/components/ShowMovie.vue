@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <pulse-loader v-if="loading"></pulse-loader>
+  <div v-else>
     <div v-if="!isEdit" class="show-movie-container">
       <h2 class="movie-title">{{ movie.title }}({{ movie.year }})</h2>
       <div class="movie-body">
@@ -8,25 +9,33 @@
             <p>{{ movie.description }}</p>
           </div>
           <div class="action-buttons">
-            <button @click="editMovie()">Редактировать</button>
-            <button @click="deleteMovie(movie._id)">Удалить</button>
+            <base-button
+              @click="editMovie()"
+              v-if="$store.state.authenticated === true"
+              ><template #body>Редактировать</template></base-button
+            >
+            <base-button
+              @click="deleteMovie(movie._id)"
+              v-if="$store.state.authenticated === true"
+              ><template #body>Удалить</template></base-button
+            >
+          </div>
+          <div @click="$router.back()" class="arrow-back">
+            <img src="@/assets/arrow.png" alt="" />
           </div>
         </div>
         <div class="poster-container">
           <div class="poster">
-            <img :src="`/posters/${movie.poster}`" alt="" />
+            <img :src="`/uploads/${movie.poster}`" alt="" />
           </div>
           <div class="movie-rating">
             <h4>Рейтинг: {{ movie.rating }}</h4>
           </div>
         </div>
       </div>
-      <div @click="$router.back()" class="arrow-back">
-        <img src="@/assets/arrow.png" alt="" />
-      </div>
     </div>
     <edit-movie
-      v-else
+      v-if="isEdit && $store.state.authenticated === true"
       @cancelEdit="isEdit = false"
       @saveAndExit="saveAndExit"
     ></edit-movie>
@@ -34,27 +43,32 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { server } from '../../src/utils/helper';
-import { useRoute, useRouter } from 'vue-router';
-import { onMounted, ref } from 'vue';
-import EditMovie from './EditMovie.vue';
+import axios from "axios";
+import { server } from "../../src/utils/helper";
+import { useRoute, useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
+import EditMovie from "./EditMovie.vue";
+import BaseButton from "../UI/BaseButton.vue";
 export default {
-  components: { EditMovie },
+  components: { EditMovie, BaseButton },
   setup() {
     const movie = ref({});
     const route = useRoute();
     const router = useRouter();
     const isEdit = ref(false);
-    const getMovie = () => {
-      axios
+    const loading = ref(false);
+    const getMovie = async () => {
+      loading.value = true;
+      await axios
         .get(`${server.baseURL}/movies/${route.params.id}`)
         .then((res) => (movie.value = res.data));
+      // .finally(() => (loading.value = false));
+      loading.value = false;
     };
     const deleteMovie = (id) => {
       axios
         .delete(`${server.baseURL}/movies/${id}`)
-        .then(() => router.push({ name: 'Home' }));
+        .then(() => router.push({ name: "home" }));
     };
     const editMovie = () => {
       isEdit.value = true;
@@ -66,7 +80,15 @@ export default {
     onMounted(() => {
       getMovie();
     });
-    return { getMovie, movie, deleteMovie, isEdit, editMovie, saveAndExit };
+    return {
+      getMovie,
+      movie,
+      deleteMovie,
+      isEdit,
+      editMovie,
+      saveAndExit,
+      loading,
+    };
   },
 };
 </script>
@@ -115,12 +137,11 @@ export default {
 }
 
 .arrow-back {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
   width: 40px;
   height: 25px;
   cursor: pointer;
+  margin-top: auto;
+  padding: 1rem;
 }
 
 .arrow-back > img {
@@ -130,12 +151,15 @@ export default {
 
 .action-buttons {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   margin-bottom: 1rem;
+  padding: 0 1rem;
 }
 
 .movie-decr-and-actions {
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (max-width: 800px) {

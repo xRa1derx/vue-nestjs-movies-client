@@ -1,39 +1,68 @@
 <template>
   <div class="login">
-    <input type="text" v-model="login">
-    <input type="password" v-model="password">
-    <button @click="signIn()">Click</button>
+    <div class="validation">{{ validationMessage }}</div>
+    <input type="text" placeholder="Имя пользователя" v-model="login" />
+    <input type="password" placeholder="Пароль" v-model="password" />
+    <button @click="signIn()">Войти</button>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import { server } from '../utils/helper'
-import { ref } from 'vue';
+import axios from "axios";
+import { server } from "../utils/helper";
+import { ref } from "vue";
+import { useStore } from "vuex";
+
 export default {
-  name: 'RegisterComponent',
-  props: {
-    msg: String
-  },
-  setup() {
-    const login = ref('');
-    const password = ref('');
+  name: "RegisterComponent",
+  emits: ["closeModal"],
+  setup(_, { emit }) {
+    const store = useStore();
+    const validationMessage = ref("");
+    const login = ref("");
+    const password = ref("");
     const signIn = () => {
-      axios.post(`${server.baseURL}/auth/login`, { username: login.value, password: password.value }).then((res) => console.log(res)).catch(err => console.log(err))
+      axios
+        .post(`${server.baseURL}/auth/login`, {
+          username: login.value,
+          password: password.value,
+        })
+        .then((res) => {
+          localStorage.setItem("auth", JSON.stringify(res.data));
+          store.dispatch("login", res.data.username);
+          emit("closeModal");
+        })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            validationMessage.value = "Неправильный логин или пароль";
+          }
+        });
     };
-    return { signIn, login, password }
-  }
-}
+    return { signIn, login, password, validationMessage };
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.registration {
+.login {
   display: flex;
   flex-direction: column;
   max-width: 250px;
   margin: auto;
-  gap: 5px;
+  gap: 10px;
+}
+
+.login > input {
+  border-radius: 20px;
+  background-color: cornsilk;
+  border: none;
+  padding: 2px 5px;
+}
+
+.login > button {
+  border: none;
+  border-radius: 20px;
 }
 
 h3 {
@@ -52,5 +81,9 @@ li {
 
 a {
   color: #42b983;
+}
+
+.validation {
+  color: red;
 }
 </style>

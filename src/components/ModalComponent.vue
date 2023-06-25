@@ -11,19 +11,16 @@ export default {
     <div v-if="show" class="modal-mask" @click.self="$emit('close')">
       <div class="modal-container">
         <div class="modal-header">
-          <slot name="header">default header</slot>
+          <slot name="header"></slot>
         </div>
 
         <div class="modal-body">
-          <slot name="body">default body</slot>
+          <slot name="body"></slot>
         </div>
 
         <div class="modal-footer">
           <slot name="footer">
-            default footer
-            <button class="modal-default-button" @click="$emit('close')">
-              OK
-            </button>
+            <button class="close" @click="$emit('close')">Закрыть</button>
           </slot>
         </div>
       </div>
@@ -32,7 +29,6 @@ export default {
 </template>
 
 <style scoped>
-
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -64,8 +60,10 @@ export default {
   margin: 20px 0;
 }
 
-.modal-default-button {
+.close {
   float: right;
+  border: none;
+  border-radius: 20px;
 }
 
 .modal-enter-from {

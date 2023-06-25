@@ -2,14 +2,16 @@
   <div class="movies-container">
     <div class="row">
       <div
-        @click="$router.push({ name: 'Movie', params: { id: movie._id } })"
-        v-for="movie in movies"
+        @click="$router.push({ name: 'movie', params: { id: movie._id } })"
+        v-for="movie in $store.state.movies"
         :key="movie._id"
         class="movie"
       >
-        <h2 class="movie-title">{{ movie.title }}({{ movie.year }})</h2>
+        <h2 class="movie-title">
+          <span>{{ movie.title }}({{ movie.year }})</span>
+        </h2>
         <div class="poster">
-          <img :src="`/posters/${movie.poster}`" alt="" />
+          <img :src="`/uploads/${movie.poster}`" alt="" />
         </div>
         <div class="movie-description">
           <p>{{ movie.description }}</p>
@@ -19,24 +21,20 @@
         </div>
       </div>
     </div>
-    <store-film></store-film>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import { server } from '../../src/utils/helper';
-import { onMounted, ref } from 'vue';
-import StoreFilm from './StoreFilm.vue';
+// import axios from "axios";
+// import { server } from "../../src/utils/helper";
+import { onMounted, ref } from "vue";
+import { useStore } from "vuex";
 export default {
-  components: { StoreFilm },
   setup() {
+    const store = useStore();
     const movies = ref([]);
     const getMovies = () => {
-      axios.get(`${server.baseURL}/movies`).then((res) => {
-        console.log(res);
-        movies.value = res.data;
-      });
+      store.dispatch("getMovies");
     };
     onMounted(() => {
       getMovies();
@@ -50,17 +48,17 @@ export default {
 .movies-container {
   max-width: 1200px;
   margin: auto;
-  padding-left: 15px;
-  padding-right: 15px;
+  /* padding-left: 15px;
+  padding-right: 15px; */
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
-  margin-left: -15px;
-  margin-right: -15px;
+  /* margin-left: -15px;
+  margin-right: -15px; */
   gap: 5px;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .movie {
@@ -107,6 +105,16 @@ export default {
 
 .movie-rating {
   margin-top: auto;
+}
+
+.movie-title {
+  display: flex;
+  min-height: 84px;
+}
+
+.movie-title > span {
+  align-self: center;
+  flex: 100%;
 }
 
 @media (max-width: 1212px) {

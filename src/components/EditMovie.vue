@@ -2,23 +2,30 @@
   <div class="show-movie-container">
     <div class="movie-body">
       <div class="movie-decr-and-actions">
-        <input type="text" placeholder="Title" v-model="movie.title" />
+        <label for="title">Название фильма</label>
+        <input id="title" type="text" v-model="movie.title" />
+        <label for="title">Год</label>
         <input type="text" placeholder="Year" v-model="movie.year" />
+        <label for="title">Описание</label>
         <div class="movie-description">
           <textarea v-model="movie.description"></textarea>
         </div>
         <div class="action-buttons">
-          <button @click="updateMovie()">сохранить</button>
-          <button @click="$emit('cancelEdit')">назад</button>
+          <base-button @click="updateMovie()">
+            <template #body> сохранить </template></base-button
+          >
+          <base-button @click="$emit('cancelEdit')"
+            ><template #body> назад </template></base-button
+          >
         </div>
       </div>
       <div class="poster-container">
         <div class="poster">
-          <img :src="`/posters/${movie.poster}`" alt="" />
+          <img :src="`/uploads/${movie.poster}`" alt="" />
           <input id="fileUpload" type="file" hidden @change="previewPoster" />
-          <button class="poster-change" @click="changePoster()">
-            Сменить постер
-          </button>
+          <base-button class="poster-change" @click="changePoster()"
+            ><template #body> Сменить постер </template></base-button
+          >
         </div>
         <div class="edit-rating">
           <input
@@ -38,18 +45,20 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { server } from '../../src/utils/helper';
-import { useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
+import axios from "axios";
+import { server } from "../../src/utils/helper";
+import { useRoute } from "vue-router";
+import { onMounted, ref } from "vue";
+import BaseButton from "../UI/BaseButton.vue";
 export default {
-  emits: ['cancelEdit', 'saveAndExit'],
+  components: { BaseButton },
+  emits: ["cancelEdit", "saveAndExit"],
   setup(_, { emit }) {
     const movie = ref({});
     const route = useRoute();
     const poster = ref(null);
     const changePoster = () => {
-      document.getElementById('fileUpload').click();
+      document.getElementById("fileUpload").click();
     };
     const previewPoster = (event) => {
       poster.value = event.target.files[0];
@@ -61,21 +70,19 @@ export default {
     };
     const updateMovie = () => {
       const formData = new FormData();
-      formData.append('poster', poster.value || movie.value.poster);
-      formData.append('title', movie.value.title);
-      formData.append('description', movie.value.description);
-      formData.append('rating', movie.value.rating);
-      formData.append('year', movie.value.year);
+      formData.append("poster", poster.value || movie.value.poster);
+      formData.append("title", movie.value.title);
+      formData.append("description", movie.value.description);
+      formData.append("rating", movie.value.rating);
+      formData.append("year", movie.value.year);
       axios
-        .patch(`${server.baseURL}/movies/${route.params.id}`, formData
-        , {
+        .patch(`${server.baseURL}/movies/${route.params.id}`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        }
-        )
+        })
         .then((res) => {
-          emit('saveAndExit', res.data);
+          emit("saveAndExit", res.data);
         });
     };
     const deleteMovie = (id) => {
@@ -100,6 +107,17 @@ export default {
 <style scoped>
 input {
   width: fit-content;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: cornsilk;
+  padding: 2px 5px;
+}
+
+label {
+  text-align: left;
+  font-size: 12px;
+  color: #5c5c5c;
 }
 
 .show-movie-container {
@@ -116,21 +134,17 @@ input {
   display: flex;
   margin: 1rem;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .movie-decr-and-actions {
   display: flex;
   flex-direction: column;
   width: 50%;
-  gap: 10px;
-}
-
-.poster-container {
 }
 
 .poster {
   position: relative;
-  margin: 1rem;
   max-width: 500px;
   height: 550px;
   box-shadow: 0 0 3px 1px #424242;
@@ -150,6 +164,10 @@ input {
 .movie-description > textarea {
   width: 100%;
   min-height: 50%;
+  resize: none;
+  border: none;
+  border-radius: 20px;
+  padding: 15px 2px;
 }
 
 .movie-rating {
@@ -158,6 +176,18 @@ input {
 
 .action-buttons {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.action-buttons > button {
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: #fff;
+  padding: 2px 5px;
+  box-shadow: 0 0 2px 1px #a0a0a0;
+  cursor: pointer;
 }
 
 .poster-change {
